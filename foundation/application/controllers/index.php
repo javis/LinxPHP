@@ -1,11 +1,10 @@
 <?php
-
-
-class IndexController extends Controller {
+class IndexController extends AppController {
+    protected $login_required = true;
     function index() {
 
-     echo "Linx PHP Framework was installed successfully! :) ";
+        $this->view->content = '';
+        $this->show();
 
     }
 }
-?>

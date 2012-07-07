@@ -1,10 +1,10 @@
 <?php
-ini_set('display_errors','1');
+ini_set('display_errors','On');
 error_reporting(E_ALL);
 /*
  * necesario para la correcta ejecucion del sitio
  */
-include_once('../linxphp/linx.php');
+include_once('../linxphp/linxphp/linx.php');
 if (!session_id()) 
 session_start();
 
@@ -19,4 +19,3 @@ Url::set_default_url_rewriter(new Regexpurlrewriter());
  * incluye el controlador indicado en la URL y ejecuta la accion que corresponde
  */
 Application::route();
-?>
