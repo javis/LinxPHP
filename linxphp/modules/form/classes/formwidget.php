@@ -154,7 +154,7 @@ abstract class FormWidget extends Template {
         $this->set('default', $this->default);
         $this->set('value', $this->value);
         $this->set('label', $this->label);
-        $this->set('name', $this->name);
+        $this->set('name', (!isset($this->attributes['name']))?$this->name:$this->attributes['name']);
         $this->set('attributes', $this->attributes);
 
         if (!empty($this->error))

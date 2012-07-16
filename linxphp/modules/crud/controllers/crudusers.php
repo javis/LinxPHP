@@ -1,67 +1,66 @@
 <?php
 
-abstract class CrudUsersController extends CrudController{
-	public function __construct(){
-		
-		$this->modelname = 'User';
-		$this->columns = array(
-			'id',
-			'username',			
-			'email',
-		);
+abstract class CrudUsersController extends CrudController {
 
-		parent::__construct();
-	}
+    public function __construct() {
 
-	/**
+        $this->modelname = 'User';
+        $this->columns = array(
+            'id',
+            'username',
+            'email',
+        );
+
+        parent::__construct();
+    }
+
+    /**
      * custom form generation depending on permissions
      */
-    protected function form($object=null){
-    	// build default form from parent class
+    protected function form($object = null) {
+        // build default form from parent class
         $form = parent::form($object);
 
         if (!Authorization::has_access('role_assign'))
-        $form->remove_field('role');
+            $form->remove_field('role');
 
         return $form;
     }
 
-	/**
-	 * in case to be editting own user we'll change the permission to check
-	 */
-	protected function access($action, $id = null){
-		if (($action == 'edit' or $action == 'remove') and $id == Authorization::get_logged_user()){
-			return strtolower($this->modelname).'_'.$action.'_own';
-		}
-		else{		
-        	return strtolower($this->modelname).'_'.$action;
+    /**
+     * in case to be editting own user we'll change the permission to check
+     */
+    protected function access($action, $id = null) {
+        if (($action == 'edit' or $action == 'remove') and $id == Authorization::get_logged_user()) {
+            return strtolower($this->modelname) . '_' . $action . '_own';
+        } else {
+            return strtolower($this->modelname) . '_' . $action;
         }
     }
 
-	/**
-	 * password field validation on change
-	 */
-	protected function validate($form, $object=null){
+    /**
+     * password field validation on change
+     */
+    protected function validate($form, $object = null) {
 
-		if ($this->action == 'edit'){
-			// we won't make password required on edition
-			unset($this->view->form->widget('password')->rules['required']);
-		}
-        
-        if ($valid =  $this->view->form->is_valid()){
-        	// check username duplicity
-			$username = $this->view->form->widget('username');
+        if ($this->action == 'edit') {
+            // we won't make password required on edition
+            unset($this->view->form->widget('password')->rules['required']);
+        }
 
-			$condition = "username = '".addslashes($username->value)."'";
-			if (is_object($object)){
-				$condition .= " and id <> " . $object->id;
-			}
+        if ($valid = $this->view->form->is_valid()) {
+            // check username duplicity
+            $username = $this->view->form->widget('username');
 
-			if (Mapper::count('User',$condition)>0 ){
-				$username->error = "The Username is already taken by anoher user.";
-				$valid = false;
-			}
+            $condition = "username = '" . addslashes($username->value) . "'";
+            if (is_object($object)) {
+                $condition .= " and id <> " . $object->id;
+            }
 
+            if (Mapper::count('User', $condition) > 0) {
+                $username->error = "The Username is already taken by anoher user.";
+                $valid = false;
+            }
         }
 
         return $valid;
@@ -70,22 +69,20 @@ abstract class CrudUsersController extends CrudController{
     /**
      * custom submit for password
      */
-	protected function submit($object){
-		
-		if ($this->view->current_action == 'edit'){
-			// ignore password field
-			$this->view->form->widget('password')->ignore_submit = true;			
-		}
-		
-		// fill model properties with the form values
-	    $this->view->form->submit($object);
-		
-	    if ($this->view->current_action == 'edit'){
-	        // if the password field is not empty we'll assign the value
-	        if (!empty($this->view->form->widget('password')->value)){
-				$object->password = md5($this->view->form->widget('password')->value);
-			}
-		}
+    protected function submit($object) {
+
+        if ($this->view->current_action == 'edit') {
+            // ignore password field
+            $this->view->form->widget('password')->ignore_submit = true;
+        }
+
+        // fill model properties with the form values
+        $this->view->form->submit($object);
+
+        if (($this->view->current_action == 'edit' and !empty($this->view->form->widget('password')->value))
+                or $this->view->current_action == 'add') {
+            $object->password = md5($this->view->form->widget('password')->value);
+        }
     }
 
 }
