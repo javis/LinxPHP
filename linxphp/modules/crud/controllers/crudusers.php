@@ -51,15 +51,20 @@ abstract class CrudUsersController extends CrudController {
         if ($valid = $this->view->form->is_valid()) {
             // check username duplicity
             $username = $this->view->form->widget('username');
+            if ($username) {
+                
+                $condition = "username = '" . addslashes($username->value) . "'";
+            
+                if (is_object($object)) {
+                    
+                    $condition .= " and id <> " . $object->id;
+                }
 
-            $condition = "username = '" . addslashes($username->value) . "'";
-            if (is_object($object)) {
-                $condition .= " and id <> " . $object->id;
-            }
-
-            if (Mapper::count('User', $condition) > 0) {
-                $username->error = "The Username is already taken by anoher user.";
-                $valid = false;
+                if (Mapper::count('User', $condition) > 0) {
+                    $username->error = "The Username is already taken by anoher user.";
+                    $valid = false;
+                }
+                
             }
         }
 
