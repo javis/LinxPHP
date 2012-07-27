@@ -7,7 +7,7 @@ abstract class AppLoginController extends AppController {
     }
 
     public function index() {
-        if (isset($_POST) and !empty($_POST)) {
+        if (isset($_POST['email']) and !empty($_POST['email']) and isset($_POST['password']) and !empty($_POST['password'])) {
             $user = false;
             $user = Mapper::get('User', '(email = "' . addslashes($_POST['email']) . '" OR username = "' . addslashes($_POST['email']) . '") and password = MD5("' . $_POST['password'] . '")');
             if (isset($user[0])) {
